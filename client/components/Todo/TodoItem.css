@@ -1,0 +1,13 @@
+.todo {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.todo-text-container {
+  background-color: rgb(245, 243, 243);
+  padding: 10px;
+  width: 100%;
+  overflow: auto;
+  box-sizing: border-box;
+}
