@@ -9,11 +9,14 @@ import {
   Param,
   ParseUUIDPipe,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import { Todo } from 'src/types';
 import { TodoDTO, UpdateTodoDTO } from './todo.dto';
 import { TodosService } from './todos.service';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
+@UseGuards(JwtAuthGuard)
 @Controller('/todos')
 export class TodosController {
   constructor(private readonly todosService: TodosService) {}
