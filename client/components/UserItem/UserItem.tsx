@@ -1,26 +1,33 @@
-'use client';
+'use client'
 
-import { useEffect, useState } from 'react';
-import { Collapse, Space } from 'antd';
-import axios from 'axios';
-import { BACKEND_URL } from '@/lib/constants';
-import TodoItem from '../Todo/TodoItem';
-import type { Todo } from '@/lib/types';
+import { useEffect, useState } from 'react'
+import { Collapse, Space } from 'antd'
+import { useSession } from 'next-auth/react'
+import axios from 'axios'
+import { BACKEND_URL } from '@/lib/constants'
+import TodoItem from '../TodoItem/TodoItem'
+import type { Todo } from '@/lib/types'
 
 type UserItemProps = {
-  userId: string;
-  userLogin: string;
-  index: number;
-};
+  userId: string
+  userLogin: string
+  index: number
+}
 
 const UserItem = ({ userId, userLogin, index }: UserItemProps) => {
-  const [todos, setTodos] = useState<Todo[]>([]);
+  const [todos, setTodos] = useState<Todo[]>([])
+
+  const { data: session } = useSession()
 
   useEffect(() => {
     axios
-      .get(BACKEND_URL + '/todos/byCreator/' + userId)
-      .then((res) => setTodos(res.data));
-  }, []);
+      .get(BACKEND_URL + '/todos/byCreator/' + userId, {
+        headers: {
+          Authorization: `Bearer ${session!.tokens.accessToken}`,
+        },
+      })
+      .then((res) => setTodos(res.data))
+  }, [])
 
   return (
     <Collapse>
@@ -40,7 +47,7 @@ const UserItem = ({ userId, userLogin, index }: UserItemProps) => {
                   todoId={todo.id}
                   withDeleteBtn={false}
                 />
-              );
+              )
             })
           ) : (
             <span>this user has no todos yet</span>
@@ -48,7 +55,7 @@ const UserItem = ({ userId, userLogin, index }: UserItemProps) => {
         </Space>
       </Collapse.Panel>
     </Collapse>
-  );
-};
+  )
+}
 
-export default UserItem;
+export default UserItem

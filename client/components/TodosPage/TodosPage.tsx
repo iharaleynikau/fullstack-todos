@@ -1,38 +1,52 @@
-'use client';
+'use client'
 
-import { useEffect, useState } from 'react';
-import { Space, Button, Input } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
-import type { RootState } from '@/store/store';
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch } from '@/store/store';
+import { useEffect, useState } from 'react'
+import { Space, Button, Input } from 'antd'
+import { useSession } from 'next-auth/react'
+import { PlusOutlined } from '@ant-design/icons'
+import type { RootState } from '@/store/store'
+import { useDispatch, useSelector } from 'react-redux'
+import { AppDispatch } from '@/store/store'
 import {
   fetchTodosByCreatorId,
   createTodo,
-} from '@/store/Features/todos/todosSlice';
-import TodoItem from '@/components/Todo/TodoItem';
-import useShowMessage from '@/hooks/useShowMessage.hook';
-import type { Todo } from '@/lib/types';
-import './TodosPage.css';
+} from '@/store/Features/todos/todosSlice'
+import TodoItem from '@/components/TodoItem/TodoItem'
+import useShowMessage from '@/hooks/useShowMessage.hook'
+import type { Todo } from '@/lib/types'
+import './TodosPage.css'
 
-const TodosPage = ({ userId }: { userId: string }) => {
-  const [addTodoText, setAddTodoText] = useState('');
-  const message = useShowMessage();
+const TodosPage = () => {
+  const [addTodoText, setAddTodoText] = useState('')
+  const message = useShowMessage()
 
-  const todos = useSelector((state: RootState) => state.todos.todos);
-  const dispatch = useDispatch<AppDispatch>();
+  const { data: session } = useSession()
+
+  const todos = useSelector((state: RootState) => state.todos.todos)
+  const dispatch = useDispatch<AppDispatch>()
 
   useEffect(() => {
-    dispatch(fetchTodosByCreatorId(userId));
-  }, []);
+    dispatch(
+      fetchTodosByCreatorId({
+        creatorId: session!.user.id,
+        token: session!.tokens.accessToken,
+      })
+    )
+  }, [])
 
   const onCreateTodo = () => {
     if (!addTodoText.length) {
-      return message('Enter todo text!', 'error');
+      return message('Enter todo text!', 'error')
     }
 
-    dispatch(createTodo({ todoText: addTodoText, creatorId: userId }));
-  };
+    dispatch(
+      createTodo({
+        todoText: addTodoText,
+        creatorId: session!.user.id,
+        token: session!.tokens.accessToken,
+      })
+    )
+  }
 
   return (
     <div className="container">
@@ -76,13 +90,13 @@ const TodosPage = ({ userId }: { userId: string }) => {
                   todoId={todo.id}
                   todoText={todo.todoText}
                 />
-              );
+              )
             })
           )}
         </Space>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default TodosPage;
+export default TodosPage
